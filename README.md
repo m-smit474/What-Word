@@ -45,8 +45,7 @@ revealed for a correct guess, and points being awarded for guessing correctly.²
 1. Harrison Hoffman. Finding the Best Wordle Opener with Machine Learning [Internet].
 [place unknown]: Towards Data Science; February 9, 2022 [updated 2022 February 9;
 cited date - 2023 January 3]. Available from:
-https://towardsdatascience.com/finding-the-best-wordle-opener-with-machine-learning-c
-e81331c5759
+https://towardsdatascience.com/finding-the-best-wordle-opener-with-machine-learning-ce81331c5759
 2. Géron A. Hands-on Machine Learning with Scikit-Learn, Keras, and TensorFlow :
 concepts, tools, and techniques to build intelligent systems. 2nd edition. Sebastopol, CA:
 O'Reilly; 2019.
