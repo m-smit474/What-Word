@@ -4,8 +4,9 @@
 import socket
 import sys
 import PySimpleGUI as sg
+import time
 from Window import EXIT_BUTTON, window
-from Procedural import proceduralAlgorithm
+from Procedural import Procedural
 
 # Standard loopback interface address 127.0.0.1
 PORT = 6789 # Port number 
@@ -79,6 +80,7 @@ def main():
     def updateWindow(command):
         global running
         global phrase
+        global guessedLetters
 
         # Send message to server
         clientSocket.sendall(command.encode())
@@ -113,8 +115,9 @@ def main():
     def runProceduralAlgorithm():
         #Procedural loop
         # Get input, validate it, send it to other class, take guess, make guess, repeat until game over
+        algorithm = Procedural()
         while running == 'True':
-            guessLetter = proceduralAlgorithm(phrase)
+            guessLetter = algorithm.proceduralAlgorithm(phrase, guessedLetters)
             updateWindow('guess ' + guessLetter)
 
     # Create a socket using IPv4 (AF_INET) and TCP (SOCK_STREAM)
