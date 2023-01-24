@@ -88,6 +88,9 @@ class Game:
             # Score multiplier increases up to three
             self.scoreMultiplier += 1
 
+        if not self.hidden.__contains__('_'):
+            self.complete = True
+
     def guessPhrase(self, phrase):
         if self.phrase.lower() == phrase.lower():
             self.hidden = self.phrase
