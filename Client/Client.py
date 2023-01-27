@@ -117,6 +117,13 @@ def main():
         # Get input, validate it, send it to other class, take guess, make guess, repeat until game over
         algorithm = Procedural()
         while running == 'True':
+
+            event, values = window.read(2000)
+            
+            # End program if user closes window
+            if event == "Exit" or event == EXIT_BUTTON:
+                break
+
             guessLetter = algorithm.proceduralAlgorithm(phrase, guessedLetters)
             updateWindow('guess ' + guessLetter)
 
