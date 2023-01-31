@@ -30,7 +30,7 @@ import pandas as pd
 
 class Procedural:
     def __init__(self):
-        self.wordFrequencyDF = pd.read_csv('English_Word_Frequency/unigram_freq.csv')
+        self.wordFrequencyDF = pd.read_csv('English_Word_Frequency/word_frequency.csv')
 
     def proceduralAlgorithm(self, phrase, guessedLetters):
         outputLetter = None
@@ -40,9 +40,10 @@ class Procedural:
                 break
 
             highFrequencyWord = rowInDF[1]['word']
+            highFrequencyWordLength = rowInDF[1]['word_length']
             wordsInPhrase = mapWordsToSize(phrase)
             for wordInPhrase in wordsInPhrase:
-                if len(highFrequencyWord) == len(wordInPhrase):
+                if highFrequencyWordLength == len(wordInPhrase):
                     for letter in highFrequencyWord:
                         if letter not in guessedLetters:
                             outputLetter = letter
