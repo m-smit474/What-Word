@@ -1,5 +1,7 @@
 # Server.py
 # Author: Matthew Smith @m-smit474
+import logging
+from datetime import datetime
 import socket
 from threading import *
 import Game
@@ -21,7 +23,8 @@ class Client(Thread):
         # with statement using connection will automatically close socket after segment is complete
         with self.sock as connection: 
             print(f"Connected to client {self.addr[1]}")
-            
+            logging.debug('Connected to client ' + self.addr[0])
+
             while True:
                 clientInput = connection.recv(1024).decode() # Max read size is 1024
 
@@ -58,8 +61,6 @@ class Client(Thread):
                         message = self.session.hidden 
                         message = self.addGameDetails(message)
                         connection.sendall(message.encode())
-
-                
 
             print(f"Client {self.addr[1]} has disconnected")
 
@@ -116,22 +117,34 @@ class Command:
         # TODO
         #global currentSession
         if self.command == "start":
+            logging.warning('-----start game-----')
             client.session = Game.Game(self.difficulty)
         elif self.command == "end":
+            logging.critical('end')
+            logging.warning('-----game over----')    
             client.session = None
         elif self.command == "guess":
             if self.letter:
+                logging.info(self.command+":"+self.letter)
                 client.session.guessLetter(self.letter)
             elif self.phrase:
                 client.session.guessPhrase(self.phrase)
             
             if client.session.isOutOfLives():
+                logging.critical('out of lives')
+                logging.warning('-----game over----')    
                 self.command = "over"
             elif client.session.complete:
+                logging.critical('complete')
+                logging.warning('-----game over----')    
                 self.command = "complete"
 
 
 def main():
+    # Set up logging - One log file for each server run
+    logFileName = 'server_log_' + datetime.today().strftime('%Y-%m-%d') + '.log'
+    logging.basicConfig(filename="Server/logs/"+logFileName, filemode='w', level=logging.DEBUG)
+
     # Create a socket using IPv4 (AF_INET) and TCP (SOCK_STREAM)
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as serverSocket:
         serverSocket.bind((HOST,PORT))
@@ -139,6 +152,7 @@ def main():
         # Enables server to accept connections
         serverSocket.listen()
         print("Server started and listening for clients!")
+        logging.info('Server Started')
 
 
         while True:
