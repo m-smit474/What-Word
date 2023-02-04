@@ -7,6 +7,7 @@ import PySimpleGUI as sg
 import time
 from Window import EXIT_BUTTON, window
 from Procedural import Procedural
+from InformationTheory import InformationTheory
 
 # Standard loopback interface address 127.0.0.1
 PORT = 6789 # Port number 
@@ -110,22 +111,28 @@ def main():
         clicked = sg.popup_ok_cancel('Do you want to run the procedural algorithm?')
     
         if clicked == 'OK':
-            runProceduralAlgorithm()
+            runAlgorithm(Procedural())
 
-    def runProceduralAlgorithm():
-        #Procedural loop
-        # Get input, validate it, send it to other class, take guess, make guess, repeat until game over
-        algorithm = Procedural()
+    def informationTheory():
+        clicked = sg.popup_ok_cancel('Do you want to run the information theory algorithm?')
+    
+        if clicked == 'OK':
+            runAlgorithm(InformationTheory())
+
+    def runAlgorithm(algorithm):
         while running == 'True':
 
             event, values = window.read(2000)
-            
-            # End program if user closes window
+
+             # End program if user closes window
             if event == "Exit" or event == EXIT_BUTTON:
                 break
 
-            guessLetter = algorithm.proceduralAlgorithm(phrase, guessedLetters)
+            guessLetter = algorithm.runAlgorithm(phrase, guessedLetters)
             updateWindow('guess ' + guessLetter)
+
+            
+
 
     # Create a socket using IPv4 (AF_INET) and TCP (SOCK_STREAM)
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as clientSocket:
@@ -186,6 +193,11 @@ def main():
                 else:
                     procedural()
 
+            if event == 'Info':
+                if running != 'True':
+                    displayNoGameRunningMessage()
+                else:
+                    informationTheory()
                 
             
         clientSocket.sendall(("exit").encode())
