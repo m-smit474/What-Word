@@ -26,9 +26,16 @@ info_layout = [
     sg.Text("Score:", **td), sg.Text("0", key="-SCORE-", **td)]
 ]
 
+control_layout = [
+    # Row 3 
+    [sg.Button('NEW GAME',**bn)], 
+    # Row 4  
+    [sg.Button('Restart', **bn)]
+]
+
 layout = [
      # Row 1
-    [sg.Button('NEW GAME',**bn),
+    [sg.Col(control_layout, element_justification='left', **cl),
     sg.Col(info_layout, element_justification='center', **cl), 
     sg.Frame('Letters Guessed', frame_layout, title_color=None, element_justification='right', background_color='#272533')],
     # Row 2

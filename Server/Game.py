@@ -18,6 +18,16 @@ class Game:
         self.readFile()
         self.createPhrase(difficulty)
         self.coverPhrase()
+
+    def restart(self):
+        self.guessedLetters = set()       # set of guessed letter
+        self.guessedWords = set()          # set of guessed words
+        self.complete = False
+        self.scoreMultiplier = 1
+        self.lives = 10
+        self.score = 0
+        self.hidden = ""
+        self.coverPhrase()
         
 
     def readFile(self):

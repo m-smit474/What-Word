@@ -110,6 +110,8 @@ class Command:
             self.difficulty = tokens[2]
         elif self.command == "exit":
             self.command = "end"
+        elif self.command == "restart":
+            self.command == "restart"
         elif self.command != "end":
             raise ValueError("Could not parse this input: ", rawInput)
 
@@ -119,6 +121,8 @@ class Command:
         if self.command == "start":
             logging.warning('-----start game-----')
             client.session = Game.Game(self.difficulty)
+        elif self.command == "restart":
+            client.session.restart()
         elif self.command == "end":
             logging.critical('end')
             logging.warning('-----game over----')    

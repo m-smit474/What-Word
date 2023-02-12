@@ -155,6 +155,7 @@ def main():
 
         global running
         running = 'False'
+        isRestartable = False
 
         # Client loop
         while True:
@@ -185,14 +186,29 @@ def main():
                 dif = getDifficulty()
 
                 if dif:
+                    isRestartable = True
                     updateWindow("start game " + str(dif))
 
+
+            # Restart button clicked
+            if event == 'Restart':
+                # You can only restart a game if one has already started
+                if isRestartable:
+                    clicked = sg.popup_ok_cancel('Do you want to restart the game?')
+    
+                    if clicked == 'OK':
+                        updateWindow("restart")
+                else:
+                    displayNoGameRunningMessage()
+
+            # Procedural button clicked
             if event == 'Procedural':
                 if running != 'True':
                     displayNoGameRunningMessage()
                 else:
                     procedural()
 
+            # Information theory button clicked
             if event == 'Info':
                 if running != 'True':
                     displayNoGameRunningMessage()
