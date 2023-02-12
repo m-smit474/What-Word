@@ -11,6 +11,44 @@ from InformationTheory import InformationTheory
 # Standard loopback interface address 127.0.0.1
 PORT = 6789 # Port number 
 
+def main():
+    # Create a socket using IPv4 (AF_INET) and TCP (SOCK_STREAM)
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as clientSocket:
+        # Connect to server
+        try:
+            HOST = "127.0.0.1"
+            clientSocket.connect((HOST,PORT))
+        except ConnectionRefusedError:
+                # No server found
+            displayNoServerMessage()
+            sys.exit(1)
+        except TimeoutError:
+                # No server found
+            displayNoServerMessage()
+            sys.exit(1)
+
+        # Check for command line arguments
+        if len(sys.argv) == 2:
+            if sys.argv[1] == 'compare':
+                window.read(1000)
+                listOfAlgorithms = [Procedural(), InformationTheory()]
+                comparison = Comparison(clientSocket)
+                comparison.compare(listOfAlgorithms)
+        else: 
+            client = Client(clientSocket)
+            client.clientLoop()
+                
+            
+        clientSocket.sendall(("exit").encode())
+        window.close()
+
+def displayNoServerMessage():
+    sg.PopupError("No server found\n",
+    "Please try again later or host the server.")
+
+def displayNoGameRunningMessage():
+    sg.popup_no_buttons('Start a new game!')
+
 class Client:
     def __init__(self, clientSocket):
         self.clientSocket = clientSocket
@@ -183,37 +221,24 @@ class Client:
                 else:
                     self.informationTheory()
 
+class Comparison:
 
-def main():
-    # Create a socket using IPv4 (AF_INET) and TCP (SOCK_STREAM)
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as clientSocket:
-        # Connect to server
-        try:
-            HOST = "127.0.0.1"
-            clientSocket.connect((HOST,PORT))
-        except ConnectionRefusedError:
-                # No server found
-            displayNoServerMessage()
-            sys.exit(1)
-        except TimeoutError:
-                # No server found
-            displayNoServerMessage()
-            sys.exit(1)
-            
+    def __init__(self, clientSocket):
+        self.agent = Client(clientSocket)
 
-        client = Client(clientSocket)
-        client.clientLoop()
-                
-            
-        clientSocket.sendall(("exit").encode())
-        window.close()
+    def compare(self, listOfAlgorithms):
+        iterations = 2          # How many times to run/compare the algorithms
+        difficulty = 2          # What difficulty the game will be played on. Could be randomly chosen between 1-3
+        while iterations > 0:
 
-def displayNoServerMessage():
-    sg.PopupError("No server found\n",
-    "Please try again later or host the server.")
+            self.agent.updateWindow("start game " + str(difficulty))
 
-def displayNoGameRunningMessage():
-    sg.popup_no_buttons('Start a new game!')
+            for algorithm in listOfAlgorithms:
+                self.agent.runAlgorithm(algorithm)
+                window.read(2000)
+                self.agent.updateWindow("restart")
+
+            iterations -= 1
 
 # Run main() when not imported
 if __name__ == "__main__":
