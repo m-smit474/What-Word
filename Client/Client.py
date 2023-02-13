@@ -4,6 +4,7 @@
 import socket
 import sys
 import PySimpleGUI as sg
+import pandas as pd
 from Window import EXIT_BUTTON, window
 from Procedural import Procedural
 from InformationTheory import InformationTheory
@@ -227,18 +228,37 @@ class Comparison:
         self.agent = Client(clientSocket)
 
     def compare(self, listOfAlgorithms):
+        comparisonTable = pd.DataFrame(columns=['phrase','procedural','information'])
         iterations = 2          # How many times to run/compare the algorithms
         difficulty = 2          # What difficulty the game will be played on. Could be randomly chosen between 1-3
-        while iterations > 0:
+        index = 0
+        while index < iterations:
 
             self.agent.updateWindow("start game " + str(difficulty))
+            gamePhrase = ""
 
             for algorithm in listOfAlgorithms:
                 self.agent.runAlgorithm(algorithm)
+
+                updateDetails = phrase.split(":")
+                gamePhrase = updateDetails[1].strip()
+                win = "Win" in updateDetails[0]
+
+                if isinstance(algorithm, Procedural):
+                    proceduralWin = win
+
+
+                if isinstance(algorithm, InformationTheory):
+                    informationWin = win
+
+
                 window.read(2000)
                 self.agent.updateWindow("restart")
 
-            iterations -= 1
+            comparisonTable.loc[len(comparisonTable)] = [gamePhrase, proceduralWin, informationWin]
+            print(comparisonTable)
+
+            index += 1
 
 # Run main() when not imported
 if __name__ == "__main__":

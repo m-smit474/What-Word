@@ -48,12 +48,12 @@ class Client(Thread):
                     elif action.command == "over":
                         self.session.complete = True
 
-                        message = "Out of Lives! Score: " + str(self.session.score) 
+                        message = "Out of Lives!" 
                         message += " Phrase: " + self.session.phrase.strip('\n')
                         message = self.addGameDetails(message)
                         connection.sendall(message.encode())
                     elif action.command == "complete":
-                        message = "You Win! Score: " + str(self.session.score)
+                        message = "You Win! Phrase: " + str(self.session.phrase)
                         message = self.addGameDetails(message)
                         connection.sendall(message.encode())
                     else:
