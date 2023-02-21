@@ -11,6 +11,7 @@ from InformationTheory import InformationTheory
 
 # Standard loopback interface address 127.0.0.1
 PORT = 6789 # Port number 
+PAUSE = 50
 
 def main():
     # Create a socket using IPv4 (AF_INET) and TCP (SOCK_STREAM)
@@ -31,7 +32,7 @@ def main():
         # Check for command line arguments
         if len(sys.argv) == 2:
             if sys.argv[1] == 'compare':
-                window.read(1000)
+                window.read(PAUSE)
                 listOfAlgorithms = [Procedural(), InformationTheory()]
                 comparison = Comparison(clientSocket)
                 comparison.compare(listOfAlgorithms)
@@ -110,6 +111,8 @@ class Client:
         global running
         global phrase
         global guessedLetters
+        global lives
+        global score
 
         # Send message to server
         self.clientSocket.sendall(command.encode())
@@ -118,11 +121,14 @@ class Client:
         inFromServer = self.clientSocket.recv(1024).decode()
         clientOutput = inFromServer #.lstrip('b')
 
-        update = clientOutput.split("@")[0]
-        lives = clientOutput.split("@")[1].split(" ")[0]
-        score = clientOutput.split("@")[1].split(" ")[1]
-        running = clientOutput.split("@")[1].split(" ")[2]
-        guessedLetters = clientOutput.split("@")[1].split(" ", 3)[3].replace("'","")
+        try:
+            update = clientOutput.split("@")[0]
+            lives = clientOutput.split("@")[1].split(" ")[0]
+            score = clientOutput.split("@")[1].split(" ")[1]
+            running = clientOutput.split("@")[1].split(" ")[2]
+            guessedLetters = clientOutput.split("@")[1].split(" ", 3)[3].replace("'","")
+        except IndexError:
+            raise ConnectionError("Server response error")
 
         if guessedLetters == 'set()':
             guessedLetters = ''
@@ -148,15 +154,18 @@ class Client:
             self.runAlgorithm(InformationTheory())
 
     def runAlgorithm(self, algorithm):
+        global lettersUsed
+        lettersUsed = []
         while running == 'True':
 
-            event, values = window.read(2000)
+            event, values = window.read(PAUSE)
 
                 # End program if user closes window
             if event == "Exit" or event == EXIT_BUTTON:
                 break
 
             guessLetter = algorithm.runAlgorithm(phrase, guessedLetters)
+            lettersUsed.append(guessLetter)
             self.updateWindow('guess ' + guessLetter)
 
     def clientLoop(self):
@@ -228,8 +237,8 @@ class Comparison:
         self.agent = Client(clientSocket)
 
     def compare(self, listOfAlgorithms):
-        comparisonTable = pd.DataFrame(columns=['phrase','procedural','information'])
-        iterations = 2          # How many times to run/compare the algorithms
+        comparisonTable = pd.DataFrame(columns=['phrase','algorithm','win','lives','score','letters_guessed'])
+        iterations = 50          # How many times to run/compare the algorithms
         difficulty = 2          # What difficulty the game will be played on. Could be randomly chosen between 1-3
         index = 0
         while index < iterations:
@@ -243,22 +252,18 @@ class Comparison:
                 updateDetails = phrase.split(":")
                 gamePhrase = updateDetails[1].strip()
                 win = "Win" in updateDetails[0]
+                algorithm = type(algorithm).__name__
+                
+                comparisonTable.loc[len(comparisonTable)] = [gamePhrase, algorithm, win, lives, score, lettersUsed]
 
-                if isinstance(algorithm, Procedural):
-                    proceduralWin = win
-
-
-                if isinstance(algorithm, InformationTheory):
-                    informationWin = win
-
-
-                window.read(2000)
+                window.read(PAUSE)
                 self.agent.updateWindow("restart")
 
-            comparisonTable.loc[len(comparisonTable)] = [gamePhrase, proceduralWin, informationWin]
             print(comparisonTable)
 
             index += 1
+
+        comparisonTable.to_csv("comparison_data/comparison.csv", index=False)
 
 # Run main() when not imported
 if __name__ == "__main__":
