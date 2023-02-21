@@ -142,13 +142,13 @@ class Client:
         phrase = update
 
     def procedural(self):
-        clicked = sg.popup_ok_cancel('Do you want to run the procedural algorithm?')
+        clicked = sg.popup_ok_cancel('Do you want to run the word frequency algorithm?')
 
         if clicked == 'OK':
             self.runAlgorithm(Procedural())
 
     def informationTheory(self):
-        clicked = sg.popup_ok_cancel('Do you want to run the information theory algorithm?')
+        clicked = sg.popup_ok_cancel('Do you want to run the letter frequency algorithm?')
 
         if clicked == 'OK':
             self.runAlgorithm(InformationTheory())
@@ -218,14 +218,14 @@ class Client:
                     displayNoGameRunningMessage()
 
             # Procedural button clicked
-            if event == 'Procedural':
+            if event == 'Word':
                 if running != 'True':
                     displayNoGameRunningMessage()
                 else:
                     self.procedural()
 
             # Information theory button clicked
-            if event == 'Info':
+            if event == 'Letter':
                 if running != 'True':
                     displayNoGameRunningMessage()
                 else:

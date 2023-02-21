@@ -33,6 +33,20 @@ control_layout = [
     [sg.Button('Restart', **bn)]
 ]
 
+algorithms_layout = [
+    # Row 3 
+    [sg.Button('Random',**bn)], 
+    # Row 4  
+    [sg.Button('AI', **bn)]
+]
+
+info_algorithms_layout = [
+    # Row 3 
+    [sg.Button('Word',**bn)],  # Procedural
+    # Row 4  
+    [sg.Button('Letter', **bn)] # Info
+]
+
 layout = [
      # Row 1
     [sg.Col(control_layout, element_justification='left', **cl),
@@ -41,9 +55,9 @@ layout = [
     # Row 2
     [sg.Text("Welcome!", size=(48,1), justification='center', background_color='black', text_color='red', 
         font=('Digital-7',24), relief='sunken', key="_DISPLAY_")],
-    [sg.Button('Procedural', **bn),
+    [sg.Col(algorithms_layout, element_justification='left', **cl),
     sg.Col(guess_layout, element_justification='center', **cl),
-    sg.Button('Info', **bn)]
+    sg.Col(info_algorithms_layout, element_justification='right', **cl)]
 ]
 
 
