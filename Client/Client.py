@@ -8,10 +8,11 @@ import pandas as pd
 from Window import EXIT_BUTTON, window
 from Procedural import Procedural
 from InformationTheory import InformationTheory
+from Random import Random
 
 # Standard loopback interface address 127.0.0.1
 PORT = 6789 # Port number 
-PAUSE = 50
+PAUSE = 2000
 
 def main():
     # Create a socket using IPv4 (AF_INET) and TCP (SOCK_STREAM)
@@ -146,6 +147,12 @@ class Client:
 
         if clicked == 'OK':
             self.runAlgorithm(Procedural())
+    
+    def random(self):
+        clicked = sg.popup_ok_cancel('Do you want to run the word random letter algorithm?')
+
+        if clicked == 'OK':
+            self.runAlgorithm(Random())
 
     def informationTheory(self):
         clicked = sg.popup_ok_cancel('Do you want to run the letter frequency algorithm?')
@@ -230,6 +237,13 @@ class Client:
                     displayNoGameRunningMessage()
                 else:
                     self.informationTheory()
+
+            # Random button clicked
+            if event == 'Random':
+                if running != 'True':
+                    displayNoGameRunningMessage()
+                else:
+                    self.random()
 
 class Comparison:
 
