@@ -9,10 +9,12 @@ from Window import EXIT_BUTTON, window
 from Procedural import Procedural
 from InformationTheory import InformationTheory
 from Random import Random
+import random
+from QLearning import QLearning
 
 # Standard loopback interface address 127.0.0.1
 PORT = 6789 # Port number 
-PAUSE = 2000
+PAUSE = 250
 
 def main():
     # Create a socket using IPv4 (AF_INET) and TCP (SOCK_STREAM)
@@ -34,7 +36,7 @@ def main():
         if len(sys.argv) == 2:
             if sys.argv[1] == 'compare':
                 window.read(PAUSE)
-                listOfAlgorithms = [Procedural(), InformationTheory()]
+                listOfAlgorithms = [QLearning()]
                 comparison = Comparison(clientSocket)
                 comparison.compare(listOfAlgorithms)
         else: 
@@ -149,10 +151,16 @@ class Client:
             self.runAlgorithm(Procedural())
     
     def random(self):
-        clicked = sg.popup_ok_cancel('Do you want to run the word random letter algorithm?')
+        clicked = sg.popup_ok_cancel('Do you want to run the random letter algorithm?')
 
         if clicked == 'OK':
             self.runAlgorithm(Random())
+
+    def reinforcementLearning(self):
+        clicked = sg.popup_ok_cancel('Do you want to run the reinforcement learning algorithm?')
+
+        if clicked == 'OK':
+            self.runAlgorithm(QLearning())
 
     def informationTheory(self):
         clicked = sg.popup_ok_cancel('Do you want to run the letter frequency algorithm?')
@@ -167,7 +175,7 @@ class Client:
 
             event, values = window.read(PAUSE)
 
-                # End program if user closes window
+            # End program if user closes window
             if event == "Exit" or event == EXIT_BUTTON:
                 break
 
@@ -245,6 +253,13 @@ class Client:
                 else:
                     self.random()
 
+            # Random button clicked
+            if event == 'AI':
+                if running != 'True':
+                    displayNoGameRunningMessage()
+                else:
+                    self.reinforcementLearning()
+
 class Comparison:
 
     def __init__(self, clientSocket):
@@ -252,8 +267,8 @@ class Comparison:
 
     def compare(self, listOfAlgorithms):
         comparisonTable = pd.DataFrame(columns=['phrase','algorithm','win','lives','score','letters_guessed'])
-        iterations = 50          # How many times to run/compare the algorithms
-        difficulty = 2          # What difficulty the game will be played on. Could be randomly chosen between 1-3
+        iterations = 100          # How many times to run/compare the algorithms
+        difficulty = random.randint(1,3)        # What difficulty the game will be played on. Could be randomly chosen between 1-3
         index = 0
         while index < iterations:
 
@@ -272,8 +287,6 @@ class Comparison:
 
                 window.read(PAUSE)
                 self.agent.updateWindow("restart")
-
-            print(comparisonTable)
 
             index += 1
 

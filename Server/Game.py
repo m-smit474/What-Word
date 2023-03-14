@@ -31,7 +31,7 @@ class Game:
         
 
     def readFile(self):
-        file = open("Phrases.txt", "r")
+        file = open("data/training_data.txt", "r")
     
         for line in file:
             # Skip blank lines
@@ -49,13 +49,13 @@ class Game:
     def createPhrase(self, difficulty):
         
         if difficulty == '1':
-            randomIndex = random.randint(0, len(self.easyPhrases))
+            randomIndex = random.randint(0, len(self.easyPhrases) - 1)
             self.phrase = self.easyPhrases[randomIndex]
         elif difficulty == '2':
-            randomIndex = random.randint(0, len(self.normalPhrases))
+            randomIndex = random.randint(0, len(self.normalPhrases) - 1)
             self.phrase = self.normalPhrases[randomIndex]
         elif difficulty == '3':
-            randomIndex = random.randint(0, len(self.hardPhrases))
+            randomIndex = random.randint(0, len(self.hardPhrases) - 1)
             self.phrase = self.hardPhrases[randomIndex]
         else:
             raise ValueError("Invalid difficulty: ", difficulty)
