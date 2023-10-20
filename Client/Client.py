@@ -5,16 +5,23 @@ import socket
 import sys
 import PySimpleGUI as sg
 import pandas as pd
+import random
+import re
 from Window import EXIT_BUTTON, window
 from Procedural import Procedural
 from InformationTheory import InformationTheory
 from Random import Random
-import random
 from QLearning import QLearning
+from datetime import datetime
+from csv import writer
 
 # Standard loopback interface address 127.0.0.1
-PORT = 6789 # Port number 
-PAUSE = 250
+PORT = 6789         # Port number 
+
+# Comparison Parameters
+PAUSE = 600         # How long to wait during comparison guesses
+ITERATIONS = 500  # How many times to run the comparison
+ALGORITHMS = [QLearning("QTable2000"), Random(), InformationTheory(), Procedural()]
 
 def main():
     # Create a socket using IPv4 (AF_INET) and TCP (SOCK_STREAM)
@@ -33,12 +40,14 @@ def main():
             sys.exit(1)
 
         # Check for command line arguments
-        if len(sys.argv) == 2:
-            if sys.argv[1] == 'compare':
-                window.read(PAUSE)
-                listOfAlgorithms = [QLearning()]
-                comparison = Comparison(clientSocket)
-                comparison.compare(listOfAlgorithms)
+        if len(sys.argv) == 2 and sys.argv[1] == 'compare':
+            window.read(PAUSE)
+            comparison = Comparison(clientSocket)
+            comparison.compare(ALGORITHMS, ITERATIONS)
+        elif len(sys.argv) == 3 and sys.argv[1] == 'compare' and sys.argv[2].isnumeric:
+            window.read(PAUSE)
+            comparison = Comparison(clientSocket)
+            comparison.compare(ALGORITHMS, int(sys.argv[2]))
         else: 
             client = Client(clientSocket)
             client.clientLoop()
@@ -265,32 +274,51 @@ class Comparison:
     def __init__(self, clientSocket):
         self.agent = Client(clientSocket)
 
-    def compare(self, listOfAlgorithms):
+    def compare(self, listOfAlgorithms, iterations):
         comparisonTable = pd.DataFrame(columns=['phrase','algorithm','win','lives','score','letters_guessed'])
-        iterations = 100          # How many times to run/compare the algorithms
+        comparisonFileName = "comparison" + datetime.today().strftime('%Y-%m-%d-%H-%M-%S') + ".csv"
+        comparisonTable.to_csv("comparison_data/" + comparisonFileName, index=False)
         difficulty = random.randint(1,3)        # What difficulty the game will be played on. Could be randomly chosen between 1-3
         index = 0
-        while index < iterations:
+        listOfIntervals = [-1] #[0, 100, 200, 500, 1000, 2000, 4000]
+        while index <= iterations:
 
             self.agent.updateWindow("start game " + str(difficulty))
             gamePhrase = ""
 
             for algorithm in listOfAlgorithms:
+
+                # Take snapshot of Q-Table at different itervals
+                if isinstance(algorithm, QLearning):
+                    if index in listOfIntervals:
+                        filePath = '.' + algorithm.filePath.strip('.csv') + str(index) + '.csv'
+                        algorithm.qTable.to_csv(filePath, index=False)
+                        if index != 0:
+                            # Adjust algorithm parameters as training progresses
+                            algorithm.tuneParameters()
+                
                 self.agent.runAlgorithm(algorithm)
 
                 updateDetails = phrase.split(":")
                 gamePhrase = updateDetails[1].strip()
                 win = "Win" in updateDetails[0]
-                algorithm = type(algorithm).__name__
+                algorithmName = type(algorithm).__name__
+
+                if algorithmName == 'QLearning':
+                    iterationList = re.findall(r'\d+', algorithm.filePath)
+                    algorithmName = algorithmName + iterationList[0]
                 
-                comparisonTable.loc[len(comparisonTable)] = [gamePhrase, algorithm, win, lives, score, lettersUsed]
+                comparisonTable.loc[len(comparisonTable)] = [gamePhrase, algorithmName, win, lives, score, lettersUsed]
+                # Append to file
+                with open("comparison_data/" + comparisonFileName, mode='a') as file:
+                    fileWriter = writer(file)
+                    fileWriter.writerow(comparisonTable.iloc[len(comparisonTable) - 1])
 
                 window.read(PAUSE)
                 self.agent.updateWindow("restart")
 
-            index += 1
+            index += 1      
 
-        comparisonTable.to_csv("comparison_data/comparison.csv", index=False)
 
 # Run main() when not imported
 if __name__ == "__main__":

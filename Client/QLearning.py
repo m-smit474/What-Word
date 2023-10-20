@@ -13,14 +13,32 @@ class QLearning:
 
     def __init__(self):
         self.lettersInAlphabet = list(string.ascii_lowercase)
-        self.gamma = 0.8
-        self.learningRate = 0.8
+        self.epsilon = 0.8          # How much exploring vs exploiting to do, high value = high exploring
+        self.gamma = 0.3            # The importance of future rewards vs current reward, high value = more importance for future reward
+        self.learningRate = 0.9     # How much new information overrides old information
         self.reward = 0
         self.availableStates = ['start', 'correct', 'incorrect']
         self.state = self.availableStates[START]
         self.previousPhrase = None
-        self.filePath = "./QTable.csv"
+        self.filePath = "./QTable_Data/Second_QTable.csv"
         self.checkTable()
+
+    def __init__(self, filename):
+        self.lettersInAlphabet = list(string.ascii_lowercase)
+        self.epsilon = 0.1          # How much exploring vs exploiting to do, high value = high exploring
+        self.gamma = 0.3            # The importance of future rewards vs current reward, high value = more importance for future reward
+        self.learningRate = 0.9     # How much new information overrides old information
+        self.reward = 0
+        self.availableStates = ['start', 'correct', 'incorrect']
+        self.state = self.availableStates[START]
+        self.previousPhrase = None
+        self.filePath = "./QTable_Data/" + filename +".csv"
+        self.checkTable()
+
+
+    def tuneParameters(self):
+        self.epsilon = self.epsilon - 0.1
+        self.gamma = self.gamma + 0.1
 
     def runAlgorithm(self, phrase, guessedLetters):
         guessLetter = None
@@ -31,8 +49,7 @@ class QLearning:
             self.updateTable()
 
         # Epsilon determines how much exploring to do
-        epsilon = 0.8
-        if random.uniform(0, 1) < epsilon:
+        if random.uniform(0, 1) < self.epsilon:
             """
             Explore: select a random action    
             """

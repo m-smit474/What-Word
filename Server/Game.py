@@ -31,7 +31,7 @@ class Game:
         
 
     def readFile(self):
-        file = open("data/training_data.txt", "r")
+        file = open("Phrases.txt", "r")
     
         for line in file:
             # Skip blank lines
