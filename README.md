@@ -16,6 +16,7 @@ entire phrase is revealed, or they run out of lives.
 
 ### Client -
 `python .\Client\Client.py` -> starts the client
+
 `python .\Client\Client.py compare <iterations>` -> compares algorithms described below for given number of iterations
 
 
