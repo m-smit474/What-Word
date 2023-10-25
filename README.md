@@ -10,6 +10,14 @@ also awarded some points, for each occurance of the letter. If the letter is not
 the player loses one of ten lives. The game continues with the player guessing letters until the
 entire phrase is revealed, or they run out of lives.
 
+# Usage:
+### Server -
+`python .\Server\Server.py` -> starts the server
+
+### Client -
+`python .\Client\Client.py` -> starts the client
+`python .\Client\Client.py compare <iterations>` -> compares algorithms described below for given number of iterations
+
 
 # Objective:
 
